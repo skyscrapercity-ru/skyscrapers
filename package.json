@@ -12,9 +12,12 @@
     "webpack-cli": "^5.1.4"
   },
   "repository": {
-   "url": "git+https://github.com/skyscrapercity-ru/skyscrapers.git"
+    "url": "git+https://github.com/skyscrapercity-ru/skyscrapers.git"
   },
   "scripts": {
     "build": "webpack --config=webpack.config.babel.ts"
+  },
+  "dependencies": {
+    "typed-inject": "^4.0.0"
   }
 }

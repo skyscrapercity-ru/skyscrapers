@@ -1,3 +1,4 @@
+import { defineComponent } from "./composition-root";
 import { TestComponent } from "./components/test";
 
-customElements.define('test-component', TestComponent);
+defineComponent('test-component', TestComponent);

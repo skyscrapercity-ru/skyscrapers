@@ -1,8 +1,5 @@
-export class TestComponent extends HTMLElement {
-    constructor() {
-      super();
-  
-      this.innerHTML = '<div>test<div>';
-    }
-  }
-  
+import { Component } from "./component";
+
+export class TestComponent implements Component {
+  html = '<p>test</p>';
+}
