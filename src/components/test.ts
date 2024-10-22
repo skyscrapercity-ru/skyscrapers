@@ -1,14 +1,15 @@
-import { Component } from "./component";
+import { Component, ShadowMode } from "./component";
+import { ComponentTemplate } from "./component-template";
 
 export class TestComponent extends Component {
-  html = '<p><slot name="slt"></slot></p>';
+  static template = new ComponentTemplate('<p><slot name="slt"></slot></p>');
+  node = TestComponent.template.clone();
 
-  slot: Element;
+  private slot: Element;
 
-  init = (doc: ParentNode) => {
-    this.slot = this.getSlot(doc, 'slt');
+  onInit = () => {
+    this.slot = this.getSlot('slt');
     this.slot.textContent = 'test';
-    doc.querySelector('p').addEventListener('click',
-      () => this.slot.textContent = 'test ' + new Date().toTimeString());
+    this.listen('p', 'click', () => this.slot.textContent = 'test ' + new Date().toTimeString());
   };
 }
