@@ -12,14 +12,22 @@ export function defineComponent<TComponent extends Component>(name: string, cons
     const component = serviceProvider.injectClass(constructor);
     const template = document.createElement('template');
     template.innerHTML = component.html;
+
     customElements.define(name, class extends HTMLElement {
         constructor() {
             super();
+            const node = template.content.cloneNode(true);
+            let root: ParentNode;
             if (shadowMode == ShadowMode.Attached) {
-                this.attachShadow({ mode: 'open' })
-                    .appendChild(template.content.cloneNode(true));
+                this.attachShadow({ mode: 'open' }).appendChild(node);
+                root = this.shadowRoot;
             } else {
-                this.append(template.content.cloneNode(true));
+                this.append(node);
+                root = this;
+            }
+
+            if (component.init) {
+                component.init(root);
             }
         }
     });
