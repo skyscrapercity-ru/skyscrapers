@@ -1,4 +1,4 @@
 import { defineComponent } from "./composition-root";
-import { TestComponent } from "./components/test";
+import { RatingBox } from "./components/rating-box";
 
-defineComponent('test-component', TestComponent);
+defineComponent('rating-box', RatingBox);
