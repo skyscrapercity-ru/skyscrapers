@@ -19,19 +19,11 @@ class BuildingsDataWebpackPlugin {
           const asset = assets[assetName];
           if (!asset) throw new Error('main.js asset is not found');
 
-          delete compilation.assets[assetName];
-          compilation.assetsInfo.delete(assetName);
-
           const modified = this.getBuildingsMap() + asset.source();
           const hash = assetInfo.contenthash;
           assetInfo.contenthash = crypto.createHash('md5').update(modified).digest('hex');
-          assetName = assetName.replace(hash, assetInfo.contenthash);
-          
-          compilation.assetsInfo.set(assetName, assetInfo);
-          assets[assetName] = {
-            source: () => modified,
-            size: () => modified.length
-          };
+          compilation.updateAsset(assetName, { source: () => modified, size: () => modified.length });
+          compilation.renameAsset(assetName, assetName.replace(hash, assetInfo.contenthash));
         }
       );
     });
@@ -78,10 +70,10 @@ const config: Configuration = {
     clean: true
   },
   plugins: [
+    new BuildingsDataWebpackPlugin(),
     new HtmlWebpackPlugin({
       template: './src/index.html'
-    }),
-    new BuildingsDataWebpackPlugin()
+    })
   ],
   devServer: {
     watchFiles: path.join(__dirname, 'src'),
