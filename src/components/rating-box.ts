@@ -13,8 +13,7 @@ export class RatingBox extends SlotComponent {
     static inject = ['ratingService'] as const;
 
     protected onInit = async () => {
-        const buildings = await this.ratingService.getBuildings();
-        buildings.forEach((items: Building[], city: string) => {
+        this.ratingService.buildings.forEach((items, city) => {
             this.slot.appendChild(this.createElement("p", city))
             items.forEach(b => this.slot.appendChild(this.createElement("div", b.name)))
         })

@@ -1,8 +1,8 @@
 ﻿using System.Text.RegularExpressions;
 using CsQuery;
 
-await using var file = File.Create("buildings.txt");
-await using var streamWriter = new StreamWriter(file);
+if (!Directory.Exists("data")) Directory.CreateDirectory("data");
+    
 var client = new HttpClient();
 var response = await client.GetStringAsync("https://skycity20.ru/");
 CQ dom = response;
@@ -11,8 +11,8 @@ for (var i = 0; i < blocks.Length - 1; i += 2)
 {
     var title = blocks[i].ChildNodes[1].TextContent;
     Console.WriteLine(title);
-    await streamWriter.WriteLineAsync();
-    await streamWriter.WriteLineAsync(title);
+    await using var file = File.Create($"data/{title}.txt");
+    await using var streamWriter = new StreamWriter(file);
     foreach (var building in blocks.Eq(i + 1).Find("li"))
     {
         try
