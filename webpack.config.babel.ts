@@ -3,6 +3,7 @@ import path from 'path';
 import { type Configuration } from 'webpack'
 import "webpack-dev-server";
 import fs from 'fs';
+import crypto from 'crypto';
 
 class BuildingsDataWebpackPlugin {
   apply(compiler) {
@@ -11,16 +12,26 @@ class BuildingsDataWebpackPlugin {
           name: 'BuildingsDataWebpackPlugin',
           stage: compiler.webpack.Compilation.PROCESS_ASSETS_STAGE_PRE_PROCESS,
         }, assets => {
-          const assetName = Object.keys(assets).find(fileName => fileName.startsWith('main.') && fileName.endsWith('.js'));
+          let assetName = Object.keys(assets).find(fileName => fileName.startsWith('main.') && fileName.endsWith('.js'));
           if (!assetName) throw new Error('main.js is not found');
+          const assetInfo = compilation.assetsInfo.get(assetName);
+          if (!assetInfo) throw new Error('main.js info is not found');
+          const asset = assets[assetName];
+          if (!asset) throw new Error('main.js asset is not found');
 
-          const asset = compilation.assets[assetName];
+          delete compilation.assets[assetName];
+          compilation.assetsInfo.delete(assetName);
+
           const modified = this.getBuildingsMap() + asset.source();
-
-          compilation.updateAsset(assetName, {
-              source: () => modified,
-              size: () => modified.length
-          });
+          const hash = assetInfo.contenthash;
+          assetInfo.contenthash = crypto.createHash('md5').update(modified).digest('hex');
+          assetName = assetName.replace(hash, assetInfo.contenthash);
+          
+          compilation.assetsInfo.set(assetName, assetInfo);
+          assets[assetName] = {
+            source: () => modified,
+            size: () => modified.length
+          };
         }
       );
     });
@@ -62,7 +73,7 @@ const config: Configuration = {
     ],
   },
   output: {
-    filename: '[name].[chunkhash].js',
+    filename: '[name].[contenthash].js',
     path: path.resolve(__dirname, 'dist'),
     clean: true
   },
