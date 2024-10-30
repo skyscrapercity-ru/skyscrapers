@@ -6,22 +6,9 @@ import { TableRow } from "./table-row";
 export class RatingBox extends SlotComponent {
     private static template = new ComponentTemplate(
         `<style>
-        .box {
-            display: grid;
-            background: #f5f5f5;
-            grid-template-columns: 40px repeat(3, 80px) 1fr;
-            font-size: large;           
-        }
-
-        .box div {
-            cursor: default;
-            margin: 6px 0;
-            text-align: center;
-        }    
-            
-        .box div.city { 
-            text-align: left;
-        }
+            div {
+                background: #f5f5f5;     
+            }
         </style>
         <div class="box"><slot name="main"></slot></div>`);
     protected node = RatingBox.template.clone();
@@ -29,21 +16,25 @@ export class RatingBox extends SlotComponent {
     constructor(private readonly ratingService: RatingService, private readonly createTableRow: () => TableRow) {
         super();
     }
-    static inject = ['ratingService', 'createTableRow'] as const;
+    static inject = ['ratingService', 'table-row'] as const;
 
-    protected onInit = async () => {
-        this.slot.appendChild(this.createElement('div', 'Место'));
-        this.slot.appendChild(this.createElement('div', 'Баллы'));
-        this.slot.appendChild(this.createElement('div', 'Здания'));
-        this.slot.appendChild(this.createElement('div', 'Этажи'));
-        this.slot.appendChild(this.createElement('div', 'Город', 'city'));
+    protected onInit = () => {
+        const header = this.createTableRow();
+        this.mainSlot.appendChild(header);
+        header.mainSlot.appendChild(this.createElement('div', 'Место'));
+        header.mainSlot.appendChild(this.createElement('div', 'Баллы'));
+        header.mainSlot.appendChild(this.createElement('div', 'Здания'));
+        header.mainSlot.appendChild(this.createElement('div', 'Этажи'));
+        header.mainSlot.appendChild(this.createElement('div', 'Город', 'city'));
 
         this.ratingService.buildings.forEach((items, city) => {
-            this.slot.appendChild(this.createElement('div', '1'))
-            this.slot.appendChild(this.createElement('div', '1'));
-            this.slot.appendChild(this.createElement('div', '1'));
-            this.slot.appendChild(this.createElement('div', '2000'));
-            this.slot.appendChild(this.createElement('div', city, 'city'));
+            const row = this.createTableRow();
+            this.mainSlot.appendChild(row);
+            row.mainSlot.appendChild(this.createElement('div', '1'))
+            row.mainSlot.appendChild(this.createElement('div', '1'));
+            row.mainSlot.appendChild(this.createElement('div', '1'));
+            row.mainSlot.appendChild(this.createElement('div', '2000'));
+            row.mainSlot.appendChild(this.createElement('div', city, 'city'));
         })
     }
 }

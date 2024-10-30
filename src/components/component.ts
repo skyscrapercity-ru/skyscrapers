@@ -1,19 +1,20 @@
 export enum ShadowMode { Attached, Detached }
 
-export abstract class Component {
+export abstract class Component extends HTMLElement {
     protected onInit?: () => void;
     protected onRoot?: () => void;
     protected onAttributeChange?: (name: string, oldValue: object, newValue: object) => void;
     protected abstract node: Node;
     protected root: ParentNode;
     private isInitialized = false;
+    protected shadowMode: ShadowMode;
 
-    public init(component: HTMLElement, shadowMode: ShadowMode) {
+    connectedCallback() {
         if (!this.isInitialized) {
-            if (shadowMode == ShadowMode.Attached) {
-                this.root = component.attachShadow({ mode: 'open' });
+            if (this.shadowMode == ShadowMode.Attached) {
+                this.root = this.attachShadow({ mode: 'open' });
             } else {
-                this.root = component;
+                this.root = this;
             }
             this.root.appendChild(this.node);
 
@@ -26,12 +27,6 @@ export abstract class Component {
             }
 
             this.isInitialized = true;
-        }
-    }
-
-    public fireAttributeChange(name: string, oldValue: object, newValue: object) {
-        if (this.onAttributeChange) {
-            this.onAttributeChange(name, oldValue, newValue);
         }
     }
 
@@ -54,9 +49,13 @@ export abstract class Component {
 }
 
 export abstract class SlotComponent extends Component {
-    public slot: Element;
+    private _mainSlot: Element;
 
-    protected onRoot = () => {
-        this.slot = this.getSlot('main');
+    public get mainSlot() {
+        if (!this._mainSlot) {
+            this._mainSlot = this.getSlot('main');
+        }
+
+        return this._mainSlot;
     }
 }

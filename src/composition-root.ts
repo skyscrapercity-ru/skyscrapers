@@ -1,38 +1,25 @@
-import { createInjector } from 'typed-inject';
+import { createInjector, Injector } from 'typed-inject';
 import { Component, ShadowMode } from "./components/component";
-import { RatingBox } from './components/rating-box';
 import { RatingService } from './services/rating-service';
-import { TableRow } from './components/table-row';
 
-let serviceProvider = createInjector();
-serviceProvider = serviceProvider
-    .provideClass('ratingService', RatingService)
-    .provideClass('tableRow', TableRow)
-    .provideValue('createTableRow', () => serviceProvider.injectClass(TableRow))
-    .provideClass('ratingBox', RatingBox);
+let serviceProvider : Injector<{}> = createInjector()
+    .provideClass('ratingService', RatingService);
 
-export function defineComponent<TComponent extends Component>(name: string, constructor: new (...params: any[])
-    => TComponent, shadowMode: ShadowMode = ShadowMode.Attached, observedAttributes: string[] = []) {
-    customElements.define(name, class extends HTMLElement {
-        private readonly component: Component;
+export function defineComponent<TComponent extends new (...args: any[]) => Component>(
+    name: string, ctor: TComponent, shadowMode: ShadowMode = ShadowMode.Attached) {
+    customElements.define(name, class extends ctor {
+        protected node: Node;
 
-        constructor() {
-            super();
-            this.component = serviceProvider.injectClass(constructor);
-        }
-        
-        connectedCallback() {
-            this.component.init(this, shadowMode);
-        }
-
-        static get observedAttributes() {
-            return observedAttributes;
-        }
-
-        attributeChangedCallback(name: string, oldValue: object, newValue: object) {
-            if (oldValue) {
-                this.component.fireAttributeChange(name, oldValue, newValue);
+        constructor(...args: any[]) {
+            const depTokens = (ctor as any).inject as string[];
+            if (depTokens) {
+                const deps = depTokens.map(token => (serviceProvider as any).resolve(token));
+                super(...deps);
+            } else {
+                super();
             }
+            this.shadowMode = shadowMode;
         }
     });
+    serviceProvider = serviceProvider.provideValue(name, () => document.createElement(name));
 }
