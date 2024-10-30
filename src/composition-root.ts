@@ -2,9 +2,13 @@ import { createInjector } from 'typed-inject';
 import { Component, ShadowMode } from "./components/component";
 import { RatingBox } from './components/rating-box';
 import { RatingService } from './services/rating-service';
+import { TableRow } from './components/table-row';
 
-const serviceProvider = createInjector()
+let serviceProvider = createInjector();
+serviceProvider = serviceProvider
     .provideClass('ratingService', RatingService)
+    .provideClass('tableRow', TableRow)
+    .provideValue('createTableRow', () => serviceProvider.injectClass(TableRow))
     .provideClass('ratingBox', RatingBox);
 
 export function defineComponent<TComponent extends Component>(name: string, constructor: new (...params: any[])

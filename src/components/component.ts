@@ -43,15 +43,18 @@ export abstract class Component {
         this.root.querySelector(selector).addEventListener(event, listener);
     }
 
-    protected createElement(tag: string, html: string) {
+    protected createElement(tag: string, html: string, className?: string) {
         const element = document.createElement(tag);
         element.innerHTML = html;
+        if (className) {
+            element.className = className;
+        }
         return element;
     }
 }
 
 export abstract class SlotComponent extends Component {
-    protected slot: Element;
+    public slot: Element;
 
     protected onRoot = () => {
         this.slot = this.getSlot('main');
