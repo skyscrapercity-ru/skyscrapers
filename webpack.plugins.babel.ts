@@ -57,6 +57,7 @@ export class DiccCompilerPlugin {
   private prevContentHash: string;
 
   apply(compiler: any) {
+    if (compiler.options.mode !== 'development') return;
     compiler.hooks.thisCompilation.tap('DiccCompilerPlugin', (compilation: any) => {
         compilation.hooks.processAssets.tap({
           name: 'DiccCompilerPlugin',
@@ -65,24 +66,28 @@ export class DiccCompilerPlugin {
           const { assetInfo } = getAsset(compilation);
           if (this.prevContentHash != assetInfo.contenthash) {
             this.prevContentHash = assetInfo.contenthash;
-            const t = performance.now();
-            exec('npm run di', (err, stdout, stderr) => {
-              if (err) {
-                console.error(`Error executing command: ${err}`);
-                if (stdout) {
-                  console.log(`stdout: ${stdout}`);
-                }
-                if (stderr) {
-                  console.error(`stderr: ${err}`);
-                }
-                return;
-              }
-              
-              console.log(`dicc compiled successfully in ${Math.round(performance.now() - t)} ms`);
-            });
+            this.compile();
           }
         }
       );
+    });
+  }
+
+  compile() {
+    const t = performance.now();
+    exec('npm run di', (err, stdout, stderr) => {
+      if (err) {
+        console.error(`Error executing command: ${err}`);
+        if (stdout) {
+          console.log(`stdout: ${stdout}`);
+        }
+        if (stderr) {
+          console.error(`stderr: ${err}`);
+        }
+        return;
+      }
+
+      console.log(`dicc compiled successfully in ${Math.round(performance.now() - t)} ms`);
     });
   }
 }

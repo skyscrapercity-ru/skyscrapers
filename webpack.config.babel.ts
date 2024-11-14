@@ -6,6 +6,8 @@ import "webpack-dev-server";
 
 const patch = new DiccPatchPlugin();
 patch.apply();
+const dicc = new DiccCompilerPlugin();
+dicc.compile();
 
 const config: Configuration = {
   entry: ['./src/main.ts'],
@@ -27,8 +29,8 @@ const config: Configuration = {
     clean: true
   },
   plugins: [
+    dicc,
     new BuildingsDataPlugin(),
-    new DiccCompilerPlugin(),
     new HtmlWebpackPlugin({
       template: './src/index.html'
     })
