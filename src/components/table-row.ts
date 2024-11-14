@@ -23,4 +23,8 @@ export class TableRow extends SlotComponent {
         <div class="grid"><slot name="main"></slot></div>`
     );
     protected node = TableRow.template.clone();
+
+    constructor() {
+        super();
+    }
 }
