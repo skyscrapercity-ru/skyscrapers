@@ -1,7 +1,7 @@
 import fs from 'fs';
 import crypto from 'crypto';
 import path from 'path';
-import { exec } from 'child_process';
+import { execSync } from 'child_process';
 
 function getAsset(compilation: any) {
   let assetName = Object.keys(compilation.assets).find(fileName => fileName.startsWith('main.') && fileName.endsWith('.js'));
@@ -74,21 +74,21 @@ export class DiccCompilerPlugin {
   }
 
   compile() {
-    const t = performance.now();
-    exec('npm run di', (err, stdout, stderr) => {
-      if (err) {
-        console.error(`Error executing command: ${err}`);
-        if (stdout) {
-          console.log(`stdout: ${stdout}`);
-        }
-        if (stderr) {
-          console.error(`stderr: ${err}`);
-        }
-        return;
+    const startTime = performance.now();
+    try {
+      execSync('npm run di');
+    }
+    catch (err) {
+      if (err.stdout) {
+        console.log(err.stdout.toString());
       }
+      if (err.stderr) {
+        console.log(err.stderr.toString());
+      }
+      throw new Error('dicc failed to compile');
+    }
 
-      console.log(`dicc compiled successfully in ${Math.round(performance.now() - t)} ms`);
-    });
+    console.log(`dicc compiled successfully in ${Math.round(performance.now() - startTime)} ms`);
   }
 }
 
