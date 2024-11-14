@@ -400,3 +400,4 @@ FodyWeavers.xsd
 
 .DS_Store
 /dist
+/src/service-provider.ts

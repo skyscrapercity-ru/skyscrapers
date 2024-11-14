@@ -5,6 +5,7 @@
     "@babel/register": "^7.25.7",
     "@types/node": "^22.7.6",
     "@types/webpack": "^5.28.5",
+    "dicc-cli": "^0.1.0",
     "html-webpack-plugin": "^5.6.0",
     "ts-loader": "^9.5.1",
     "ts-node": "^10.9.2",
@@ -16,10 +17,11 @@
     "url": "git+https://github.com/skyscrapercity-ru/skyscrapers.git"
   },
   "scripts": {
+    "di": "dicc",
     "build": "webpack serve --mode development --config=webpack.config.babel.ts",
-    "publish": "webpack --config=webpack.config.babel.ts"
+    "publish": "npm run di && webpack --config=webpack.config.babel.ts"
   },
   "dependencies": {
-    "typed-inject": "^4.0.0"
+    "dicc": "^0.1.0"
   }
 }

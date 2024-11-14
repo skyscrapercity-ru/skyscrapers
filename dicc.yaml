@@ -1,0 +1,10 @@
+project: './tsconfig.json'
+containers:
+  src/service-provider.ts:
+    className: 'ServiceProvider'
+    typeCheck: true
+    resources:
+      src/services/*.ts: ~
+      src/components/*.ts:
+        exclude:
+          - src/components/component-template.ts

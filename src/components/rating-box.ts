@@ -11,12 +11,12 @@ export class RatingBox extends SlotComponent {
             }
         </style>
         <div class="box"><slot name="main"></slot></div>`);
+        
     protected node = RatingBox.template.clone();
 
     constructor(private readonly ratingService: RatingService, private readonly createTableRow: () => TableRow) {
         super();
     }
-    static inject = ['ratingService', 'table-row'] as const;
 
     protected onInit = () => {
         const header = this.createTableRow();
