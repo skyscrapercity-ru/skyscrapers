@@ -4,6 +4,9 @@ import path from 'path';
 import { type Configuration } from 'webpack'
 import "webpack-dev-server";
 
+const patch = new DiccPatchPlugin();
+patch.apply();
+
 const config: Configuration = {
   entry: ['./src/main.ts'],
   mode: 'none',
@@ -24,7 +27,6 @@ const config: Configuration = {
     clean: true
   },
   plugins: [
-    new DiccPatchPlugin(),
     new BuildingsDataPlugin(),
     new DiccCompilerPlugin(),
     new HtmlWebpackPlugin({

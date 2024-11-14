@@ -88,7 +88,7 @@ export class DiccCompilerPlugin {
 }
 
 export class DiccPatchPlugin {
-  apply(compiler: any) {
+  apply() {
     this.patchContainer();
     this.patchContainerContract();
     this.patchCompiler();
