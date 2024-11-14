@@ -19,7 +19,7 @@
   "scripts": {
     "di": "dicc",
     "build": "webpack serve --mode development --config=webpack.config.babel.ts",
-    "publish": "npm run di && webpack --config=webpack.config.babel.ts"
+    "publish": "webpack --config=webpack.config.babel.ts"
   },
   "dependencies": {
     "dicc": "^0.1.0"
