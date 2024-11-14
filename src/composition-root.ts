@@ -2,8 +2,8 @@ import * as dicc from "./service-provider";
 import { Component, ShadowMode } from "./components/component";
 
 class ServiceProvider extends dicc.ServiceProvider {
-    addService<T>(id: string, factory: () => T) {
-        (this as any).importDefinitions({ [id]: { factory }});
+    addService<T>(id: string, deps: any[], factory: () => T) {
+        (this as any).importDefinitions({ [id]: { factory, deps }});
     }
 
     get(id: string) {
@@ -21,11 +21,11 @@ const serviceProvider = new ServiceProvider();
 export function defineComponent<TComponent extends new (...args: any[]) => Component>(
     name: string, ctor: TComponent, shadowMode: ShadowMode = ShadowMode.Attached) {
     const id = `#${ctor.name}.0`;
+    const deps = serviceProvider.getDeps(id);
     customElements.define(name, class extends ctor {
         protected node: Node;
 
         constructor(...args: any[]) {
-            const deps = serviceProvider.getDeps(id);
             if (deps) {
                 super(...deps);
             } else {
@@ -34,5 +34,5 @@ export function defineComponent<TComponent extends new (...args: any[]) => Compo
             this.shadowMode = shadowMode;
         }
     });
-    serviceProvider.addService(id, () => document.createElement(name));
+    serviceProvider.addService(id, deps, () => document.createElement(name));
 }

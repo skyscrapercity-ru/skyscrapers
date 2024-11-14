@@ -75,6 +75,7 @@ export class DiccCompilerPlugin {
 
   compile() {
     const startTime = performance.now();
+    
     try {
       execSync('npm run di');
     }
