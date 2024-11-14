@@ -19,6 +19,7 @@ export class RatingBox extends SlotComponent {
     }
 
     protected onInit = () => {
+        console.log(this.ratingService, this.createTableRow);
         const header = this.createTableRow();
         this.mainSlot.appendChild(header);
         header.mainSlot.appendChild(this.createElement('div', 'Место'));
