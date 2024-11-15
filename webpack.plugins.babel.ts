@@ -2,17 +2,7 @@ import fs from 'fs';
 import crypto from 'crypto';
 import path from 'path';
 import { execSync } from 'child_process';
-
-function getAsset(compilation: any) {
-  let assetName = Object.keys(compilation.assets).find(fileName => fileName.startsWith('main.') && fileName.endsWith('.js'));
-  if (!assetName) throw new Error('main.js is not found');
-  const assetInfo = compilation.assetsInfo.get(assetName);
-  if (!assetInfo) throw new Error('main.js info is not found');
-  const asset = compilation.assets[assetName];
-  if (!asset) throw new Error('main.js asset is not found');
-
-  return { assetName, assetInfo, asset };
-}
+import { parse } from 'yaml'
 
 export class BuildingsDataPlugin {
     apply(compiler: any) {
@@ -21,7 +11,13 @@ export class BuildingsDataPlugin {
             name: 'BuildingsDataPlugin',
             stage: compiler.webpack.Compilation.PROCESS_ASSETS_STAGE_PRE_PROCESS,
           }, (assets: any) => {
-            const { assetName, assetInfo, asset } = getAsset(compilation);
+            const assetName = Object.keys(compilation.assets).find(fileName => fileName.startsWith('main.') && fileName.endsWith('.js'));
+            if (!assetName) throw new Error('main.js is not found');
+            const assetInfo = compilation.assetsInfo.get(assetName);
+            if (!assetInfo) throw new Error('main.js info is not found');
+            const asset = compilation.assets[assetName];
+            if (!asset) throw new Error('main.js asset is not found');
+
             const modified = this.getBuildingsMap() + asset.source();
             const hash = assetInfo.contenthash;
             assetInfo.contenthash = crypto.createHash('md5').update(modified).digest('hex');
@@ -54,22 +50,29 @@ export class BuildingsDataPlugin {
   }
   
 export class DiccCompilerPlugin {
-  private prevContentHash: string;
+  private containers: string[];
+
+  constructor() {
+    const content = fs.readFileSync('dicc.yaml', 'utf8');
+    this.containers = Object.keys(parse(content).containers).map(p => path.resolve(__dirname, p));
+  }
 
   apply(compiler: any) {
     if (compiler.options.mode !== 'development') return;
-    compiler.hooks.thisCompilation.tap('DiccCompilerPlugin', (compilation: any) => {
-        compilation.hooks.processAssets.tap({
-          name: 'DiccCompilerPlugin',
-          stage: compiler.webpack.Compilation.PROCESS_ASSETS_STAGE_PRE_PROCESS,
-        }, (assets: any) => {
-          const { assetInfo } = getAsset(compilation);
-          if (this.prevContentHash != assetInfo.contenthash) {
-            this.prevContentHash = assetInfo.contenthash;
-            this.compile();
+
+    compiler.hooks.watchRun.tapAsync('DiccCompilerPlugin', (compilation, callback) => {
+      if (compilation.modifiedFiles) {
+        if (compilation.modifiedFiles.size === 1) {
+          let [file] = compilation.modifiedFiles;
+          if (this.containers.includes(file)) {
+            return;
           }
         }
-      );
+
+        this.compile();
+      }
+
+      callback();
     });
   }
 
