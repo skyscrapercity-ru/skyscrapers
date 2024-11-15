@@ -22,7 +22,7 @@ export function defineComponent<TComponent extends new (...args: any[]) => Compo
     name: string, ctor: TComponent, shadowMode: ShadowMode = ShadowMode.Attached) {
     const id = `#${ctor.name}.0`;
     const deps = serviceProvider.getDeps(id);
-    customElements.define(name, class extends ctor {
+    const webComponentCtor = class extends ctor {
         protected node: Node;
 
         constructor(...args: any[]) {
@@ -33,6 +33,7 @@ export function defineComponent<TComponent extends new (...args: any[]) => Compo
             }
             this.shadowMode = shadowMode;
         }
-    });
-    serviceProvider.addService(id, deps, () => document.createElement(name));
+    };
+    customElements.define(name, webComponentCtor);
+    serviceProvider.addService(id, deps, () => new webComponentCtor());
 }
