@@ -22,7 +22,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GIT_HUB_TOKEN }}
         run: |
-          [[ -z $(git status -uno --porcelain) ]] && gh run cancel ${{ github.run_id }}
+          [[ -z $(git status -uno --porcelain) ]] && gh run cancel ${{ github.run_id }} && gh run watch ${{ github.run_id }}
       - name: Commit files
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
