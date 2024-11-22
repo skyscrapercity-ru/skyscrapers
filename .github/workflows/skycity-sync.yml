@@ -19,6 +19,8 @@ jobs:
       - name: Run
         run: cd skycity-parser/SkycityParser && dotnet run ../../data
       - name: Check if there are changes
+        env:
+          GH_TOKEN: ${{ secrets.GIT_HUB_TOKEN }}
         run: |
           [[ -z $(git status -uno --porcelain) ]] && gh run cancel ${{ github.run_id }} && gh run watch ${{ github.run_id }}
       - name: Commit files
