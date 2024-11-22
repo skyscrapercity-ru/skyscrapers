@@ -1,7 +1,8 @@
 ﻿using System.Text.RegularExpressions;
 using CsQuery;
 
-if (!Directory.Exists("data")) Directory.CreateDirectory("data");
+var dirPath = Path.GetFullPath(args.Length == 1 ? args[0] : "../../../../../data");
+if (!Directory.Exists(dirPath)) throw new DirectoryNotFoundException(dirPath);
     
 var client = new HttpClient();
 var response = await client.GetStringAsync("https://skycity20.ru/");
@@ -11,7 +12,7 @@ for (var i = 0; i < blocks.Length - 1; i += 2)
 {
     var title = blocks[i].ChildNodes[1].TextContent;
     Console.WriteLine(title);
-    await using var file = File.Create($"data/{title}.txt");
+    await using var file = File.Create($"{dirPath}/{title}.txt");
     await using var streamWriter = new StreamWriter(file);
     foreach (var building in blocks.Eq(i + 1).Find("li"))
     {
